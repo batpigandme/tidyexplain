@@ -26,7 +26,6 @@ psg_long <- wide %>%
   proc_data("3-tall", color_fun = function(x, y) x) %>%
   split(.$label)
 
-# above checked -----------------------------------------------------------
 psg_long$id <-
   psg_wide %>%
   filter(label == "id") %>%
@@ -34,11 +33,11 @@ psg_long$id <-
   left_join(psg_long$id, ., by = "value") %>%
   mutate(alpha = 1)
 
-psg_long$key <-
+psg_long$name <-
   psg_wide %>%
   filter(label != "id") %>%
   select(label, color) %>%
-  left_join(psg_long$key, ., by = c("value" = "label")) %>%
+  left_join(psg_long$name, ., by = c("value" = "label")) %>%
   distinct() %>%
   mutate(alpha = 1)
 
@@ -51,7 +50,8 @@ psg_long$val <-
 
 psg_long <- bind_rows(psg_long) %>% mutate(frame = 2)
 
-psg_long_labels <- tibble(id = 1, a = "id", x = "key", y = "val") %>%
+# above checked -----------------------------------------------------------
+psg_long_labels <- tibble(id = 1, a = "id", x = "name", y = "val") %>%
   proc_data("4-label") %>%
   filter(label != "id") %>%
   mutate(color = "#FFFFFF", .y = 0, .x = .x -1, frame = 2, alpha = 1, label = recode(label, "a" = "id"))
@@ -82,13 +82,13 @@ psg_data <- bind_rows(
   psg_long_extra_id
 ) %>%
   mutate(
-    label = ifelse(value %in% setdiff(colnames(wide), "id"), "key", label),
-    label = ifelse(value %in% c("key", "val"), "zzz", label),
+    label = ifelse(value %in% setdiff(colnames(wide), "id"), "name", label),
+    label = ifelse(value %in% c("name", "val"), "zzz", label),
     .text_color = ifelse(grepl("label", .id), "black", "white"),
     .text_size = ifelse(grepl("label", .id), 8, 12)
   ) %>%
   arrange(label, .id, value) %>%
-  mutate(frame = factor(frame, labels = c('spread(long, key, val)', 'gather(wide, key, val, x:z)'))) %>%
+  mutate(frame = factor(frame, labels = c('pivot_wider(long, names_from = name, values_from = value)', 'pivot_longer(wide, -id)'))) %>%
   select(.x, .y, everything())
 
 psg_static <-
@@ -100,15 +100,15 @@ psg_static <-
          theme(plot.subtitle = element_text(family = "Fira Sans", size = 14, color = "grey50", hjust = 0.5, margin = margin(25)))
   )
 
-save_static_plot(psg_static[[1]], "tidyr-spread")
-save_static_plot(psg_static[[2]], "tidyr-gather")
+save_static_plot(psg_static[[1]], "tidyr-wider")
+save_static_plot(psg_static[[2]], "tidyr-longer")
 
 psg_anim <-
   psg_data %>%
   plot_data() %>%
   animate_plot() +
   view_follow() +
-  labs(title = "{ifelse(transitioning, next_state, ifelse(grepl('gather', next_state), 'long', 'wide'))}") +
+  labs(title = "{ifelse(transitioning, next_state, ifelse(grepl('pivot_longer', next_state), 'long', 'wide'))}") +
   ease_aes("sine-in-out", x = "exponential-out")
 
 psg_anim <- animate(psg_anim)
