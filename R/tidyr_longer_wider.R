@@ -97,7 +97,10 @@ psg_static <-
   imap(~ plot_data(.x, .y) +
          ylim(-6.5, 0.5) +
          labs(subtitle = "returns") +
-         theme(plot.subtitle = element_text(family = "Fira Sans", size = 14, color = "grey50", hjust = 0.5, margin = margin(25)))
+         theme(
+           plot.title = element_text(size = 16),
+           plot.subtitle = element_text(family = "Fira Sans", size = 14, color = "grey50", hjust = 0.5, margin = margin(25))
+           )
   )
 
 save_static_plot(psg_static[[1]], "tidyr-wider")
