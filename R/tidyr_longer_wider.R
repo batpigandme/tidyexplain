@@ -85,7 +85,7 @@ psg_data <- bind_rows(
     label = ifelse(value %in% setdiff(colnames(wide), "id"), "name", label),
     label = ifelse(value %in% c("name", "val"), "zzz", label),
     .text_color = ifelse(grepl("label", .id), "black", "white"),
-    .text_size = ifelse(grepl("label", .id), 8, 12)
+    .text_size = ifelse(grepl("label", .id), 8, 10)
   ) %>%
   arrange(label, .id, value) %>%
   mutate(frame = factor(frame, labels = c('pivot_wider(long, names_from = name, values_from = value)', 'pivot_longer(wide, -id)'))) %>%
